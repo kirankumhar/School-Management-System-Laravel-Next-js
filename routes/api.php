@@ -39,3 +39,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/admin/create-user', [AdminController::class, 'createUser'])
         ->middleware('can:isAdmin');
 });
+
+Route::post('/login', [AuthenticatedSessionController::class, 'store']);
+Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+    return $request->user();
+});
