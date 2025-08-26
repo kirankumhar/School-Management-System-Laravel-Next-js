@@ -23,7 +23,7 @@ class TeacherController extends Controller
                 ->orWhere('phone', 'like', "%{$search}%");
         }
 
-        $teachers = $query->paginate(5); // 5 per page
+        $teachers = $query->paginate(10); // 5 per page
         return response()->json($teachers);
     }
 
@@ -40,15 +40,22 @@ class TeacherController extends Controller
      */
     public function store(Request $request)
     {
-        //
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:teachers',
-            'subject' => 'nullable|string',
-            'phone' => 'nullable|string',
+            'email' => 'required|email|unique:teachers,email',
+            'subject' => 'required|string|max:255',
+            'phone' => 'required|string|max:15',
+            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $teacher = Teacher::create($request->all());
+        if ($request->hasFile('profile_picture')) {
+            $file = $request->file('profile_picture');
+            $filename = time() . '.' . $file->getClientOriginalExtension();
+            $path = $file->storeAs('uploads/teachers', $filename, 'public');
+            $validated['profile_picture'] = $path;
+        }
+
+        $teacher = Teacher::create($validated);
 
         return response()->json($teacher, 201);
     }
@@ -61,10 +68,24 @@ class TeacherController extends Controller
     }
 
     // Update teacher
-    public function update(Request $request, $id)
+    public function update(Request $request, Teacher $teacher)
     {
-        $teacher = Teacher::findOrFail($id);
-        $teacher->update($request->all());
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:teachers,email,' . $teacher->id,
+            'subject' => 'required|string|max:255',
+            'phone' => 'required|string|max:15',
+            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        if ($request->hasFile('profile_picture')) {
+            $file = $request->file('profile_picture');
+            $filename = time() . '.' . $file->getClientOriginalExtension();
+            $path = $file->storeAs('uploads/teachers', $filename, 'public');
+            $validated['profile_picture'] = $path;
+        }
+
+        $teacher->update($validated);
 
         return response()->json($teacher, 200);
     }

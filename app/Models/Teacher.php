@@ -14,5 +14,6 @@ class Teacher extends Model
         'email',
         'subject',
         'phone',
+        'profile_picture',
     ];
 }
