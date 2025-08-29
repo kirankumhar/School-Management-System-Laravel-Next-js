@@ -46,7 +46,7 @@ class StudentController extends Controller
      */
     public function show(Student $student)
     {
-        return Student::findOrFail($student);
+        return response()->json($student);
     }
 
     /**
