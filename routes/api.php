@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\SchoolClassController;
 
 Route::post('/register', [RegisteredUserController::class, 'store']);
 Route::post('/login', [AuthenticatedSessionController::class, 'store']);
@@ -54,3 +55,12 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('students', StudentController::class);
 });
+
+// Class routes
+Route::apiResource('school-classes', SchoolClassController::class);
+Route::get('school-classes/{id}/sections', [SchoolClassController::class, 'getSections']);
+
+// Section routes  
+Route::apiResource('sections', SectionController::class);
+Route::get('sections/{id}/students', [SectionController::class, 'getStudents']);
+Route::post('sections/{id}/assign-student/{studentId}', [SectionController::class, 'assignStudent']);
